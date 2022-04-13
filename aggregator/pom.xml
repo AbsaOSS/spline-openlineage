@@ -125,7 +125,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>za.co.absa.spline.testdatagen.GenCLI</Main-Class>
+                            <Main-Class>za.co.absa.spline.ol.aggregator.AggregatorApp</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -135,53 +135,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-<!--            <plugin>-->
-<!--                <groupId>io.swagger.codegen.v3</groupId>-->
-<!--                <artifactId>swagger-codegen-maven-plugin</artifactId>-->
-<!--                <version>3.0.21</version> &lt;!&ndash; please note 3.0.22+ were problematic on Windows. See Spline Issue #185 &ndash;&gt;-->
-<!--                <configuration>-->
-<!--                    <language>scala</language>-->
-<!--                    <generateModels>true</generateModels>-->
-<!--                    <generateApis>false</generateApis>-->
-<!--                    <generateSupportingFiles>false</generateSupportingFiles>-->
-<!--                    <typeMappings>array=Seq</typeMappings>-->
-<!--                    <configOptions>-->
-<!--                        <modelPropertyNaming>original</modelPropertyNaming>-->
-<!--                    </configOptions>-->
-<!--                    <inputSpec/>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>swagger.openlineage.api.v0_3_1</id>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/api/openlineage/OpenLineage.yml</inputSpec>-->
-<!--                            <modelPackage>za.co.absa.spline.ol.model.openlineage.v0_3_1</modelPackage>-->
-<!--                            <language/>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>target/generated-sources/swagger/src/main/scala</source>
-                            </sources>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -25,7 +25,6 @@ class RootServlet extends ScalatraServlet {
     <html lang="en">
       <head>
         <link href={url("/assets/css/bootstrap.css")} rel="stylesheet" />
-        <link href={url("/assets/css/bootstrap-responsive.css")} rel="stylesheet" />
       </head>
       <body>
         <div class="container">

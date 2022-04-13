@@ -20,7 +20,7 @@
         </encoder>
     </appender>
 
-    <logger name="za.co.absa" level="DEBUG"/>
+<!--    <logger name="za.co.absa" level="DEBUG"/>-->
 
     <root level="info">
         <appender-ref ref="STDOUT"/>
