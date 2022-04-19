@@ -19,6 +19,7 @@ package za.co.absa.spline.ol.aggregator
 import org.apache.commons.configuration._
 import za.co.absa.commons.config.ConfigurationImplicits.ConfigurationRequiredWrapper
 
+import java.time.Duration
 import java.util.Properties
 import scala.collection.JavaConverters._
 
@@ -26,9 +27,11 @@ class AggregatorConfig(config: Configuration) {
 
   def streamsConfig: Properties = ConfigurationConverter.getProperties(config.subset("spline.ol.streams"))
 
-  def inputTopic = config.getRequiredString("spline.ol.inputTopic")
-  def outputTopic = config.getRequiredString("spline.ol.outputTopic")
+  def inputTopic: String = config.getRequiredString("spline.ol.inputTopic")
+  def outputTopic: String = config.getRequiredString("spline.ol.outputTopic")
 
+  def aggregationWindowInactivityGap: Duration =
+    Duration.parse(config.getRequiredString("spline.ol.aggregationWindowInactivityGap"))
 
   def toMap: Map[String, AnyRef] =
     config.getKeys("spline")

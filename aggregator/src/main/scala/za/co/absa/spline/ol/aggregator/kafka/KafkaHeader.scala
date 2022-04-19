@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.spline.ol.aggregator
+package za.co.absa.spline.ol.aggregator.kafka
 
-import org.json4s.JsonAST.JValue
-import org.json4s.jackson
-import za.co.absa.commons.json.AbstractJsonSerDe
-import za.co.absa.spline.ol.aggregator.json.AggregatorFormatsBuilder
+import org.apache.kafka.common.header.Header
 
-object JsonSerDe extends AbstractJsonSerDe[JValue] with jackson.JsonMethods with AggregatorFormatsBuilder
+import java.nio.charset.StandardCharsets
+
+class KafkaHeader(key: String, value: String) extends Header {
+
+  override def key(): String = key
+
+  override def value(): Array[Byte] = value.getBytes(StandardCharsets.UTF_8)
+}

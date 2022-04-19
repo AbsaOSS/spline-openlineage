@@ -21,13 +21,14 @@ import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.kstream.SessionWindows
 import org.apache.kafka.streams.scala.ImplicitConversions._
-import org.apache.kafka.streams.scala.Serdes._
+import org.apache.kafka.streams.scala.StreamsBuilder
 import org.apache.kafka.streams.scala.kstream.Materialized
-import org.apache.kafka.streams.scala.{Serdes, StreamsBuilder}
+import org.apache.kafka.streams.scala.serialization.Serdes
+import org.apache.kafka.streams.scala.serialization.Serdes._
+import org.json4s.JNothing
 import org.json4s.JsonAST.JValue
-import org.json4s.{DefaultFormats, JNothing}
-
-import java.time.Duration
+import za.co.absa.spline.ol.aggregator.json.JsonSerDe
+import za.co.absa.spline.ol.aggregator.kafka.HeaderAppendingTransformerSupplier
 
 object AggregatorApp extends StrictLogging{
 
@@ -48,7 +49,7 @@ object AggregatorApp extends StrictLogging{
 
     logger.info(s"Config:\n${config.toMap.map{ case (k, v) => s"\t$k = $v"}.mkString("\n")}")
 
-    val window = SessionWindows.`with`(Duration.ofMinutes(1))
+    val window = SessionWindows.`with`(config.aggregationWindowInactivityGap)
 
     val builder = new StreamsBuilder
     val inputStream = builder.stream[String, JValue](config.inputTopic)
@@ -58,17 +59,19 @@ object AggregatorApp extends StrictLogging{
       .aggregate(JNothing: JValue)(
         (key, msg, aggMsg) => aggMsg.merge(msg),
         (key, msg, aggMsg) => aggMsg.merge(msg)
-      )(Materialized.as("my-store"))
+      )(Materialized.as("spline-aggregator-store"))
 
     //topic name: spline-open-lineage-aggregator-my-store-changelog
 
     table.toStream
-      .peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
+      //.peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
       .filter((k, v) => extractEventType(v) == "COMPLETE")
       .map((windowedKey, value) => (windowedKey.key(), value))
-      .peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
+      //.peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
+      //.process(() => new SplineStreamProcessor)
       .flatMap(OpenLineageToSplineConverter.convert)
-      .peek((k,v) => println("\n" + k + " -> " + v))
+      .transformValues(new HeaderAppendingTransformerSupplier)
+      //.peek((k,v) => println("\n" + k + " -> " + v))
       .to(config.outputTopic)
 
     val topology = builder.build
@@ -76,16 +79,12 @@ object AggregatorApp extends StrictLogging{
 
     streams.start()
     logger.info("Streams started")
-
-
     sys.addShutdownHook(streams.close())
   }
 
   private def extractEventType(json: JValue): String = {
-    implicit val formats = DefaultFormats
-
-    (json \ "eventType").extract[String]
+    //println(">>>" + json \ "eventType")
+    JsonSerDe.fromJValue[String](json \ "eventType")
   }
-
 
 }

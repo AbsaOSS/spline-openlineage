@@ -16,28 +16,38 @@
 
 package za.co.absa.spline.ol.aggregator
 
+import com.fasterxml.uuid.Generators
 import org.json4s.JsonAST.JValue
-import za.co.absa.spline.harvester.IdGenerator.{UUIDGeneratorFactory, UUIDNamespace}
-import za.co.absa.spline.ol.aggregator.JsonSerDe._
+import za.co.absa.spline.ol.aggregator.json.JsonSerDe
+import za.co.absa.spline.ol.aggregator.json.JsonSerDe._
 import za.co.absa.spline.ol.model.openlineage.v0_3_1.{InputDataset, OutputDataset, RunEvent}
 import za.co.absa.spline.producer.model.v1_2._
 
+import java.security.MessageDigest
 import java.util.UUID
 
 object OpenLineageToSplineConverter {
 
-  private val execPlanIdGenerator = UUIDGeneratorFactory.forVersion(5)(UUIDNamespace.ExecutionPlan)
+  val ProducerApiVersion = "v1.2"
 
-  def convert(key: String, value: JValue): Iterable[(String, String)] = {
-    implicit val formats = JsonSerDe._formats
-    val runEvent = value.extract[RunEvent]
+  val planHeaders = Map("__TypeId__" -> "ExecutionPlan", "ABSA-Spline-API-Version" -> ProducerApiVersion)
+  val eventHeaders = Map("__TypeId__" -> "ExecutionEvent", "ABSA-Spline-API-Version" -> ProducerApiVersion)
+
+
+  def convert(key: String, value: JValue): Iterable[(String, ValueAndHeaders)] = {
+    val runEvent = fromJValue[RunEvent](value)
 
     val outputIsEmpty = runEvent.outputs.map(_.isEmpty).getOrElse(true)
     if (outputIsEmpty) {
       Seq.empty
     } else {
       val planEventSeq = convert(runEvent)
-      planEventSeq.map(key -> _.toJson)
+      planEventSeq.flatMap{ case (p, e) =>
+        Seq(
+          p.id.toString -> new ValueAndHeaders(JsonSerDe.toJson(p), planHeaders),
+          e.planId.toString -> new ValueAndHeaders(JsonSerDe.toJson(e), eventHeaders)
+        )
+      }
     }
   }
 
@@ -68,7 +78,7 @@ object OpenLineageToSplineConverter {
         extraInfo = Map.empty
       )
 
-      val planId = execPlanIdGenerator.nextId(planWithoutId)
+      val planId = generateId(planWithoutId)
       val plan = planWithoutId.copy(id = planId)
 
       val event = ExecutionEvent(
@@ -99,7 +109,7 @@ object OpenLineageToSplineConverter {
   private def convertOutput(output: OutputDataset, inputIds: Seq[String]): WriteOperation = {
     WriteOperation(
       outputSource = toUri(output.name, output.namespace),
-      append = false, // TODO ???
+      append = false,
       id = UUID.randomUUID().toString,
       name = None,
       childIds = inputIds,
@@ -113,6 +123,15 @@ object OpenLineageToSplineConverter {
       s"$namespace$name"
     else
       s"$namespace/$name"
+  }
+
+  private val ExecutionPlanUUIDNamespace: UUID = UUID.fromString("475196d0-16ca-4cba-aec7-c9f2ddd9326c")
+
+  private def generateId(entity: AnyRef): UUID = {
+    val input = JsonSerDe.toJson(entity)
+    val digest = MessageDigest.getInstance("SHA-1")
+    val generator = Generators.nameBasedGenerator(ExecutionPlanUUIDNamespace, digest)
+    generator.generate(input)
   }
 
 }
