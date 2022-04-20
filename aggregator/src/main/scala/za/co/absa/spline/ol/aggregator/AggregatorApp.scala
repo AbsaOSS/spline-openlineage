@@ -30,7 +30,7 @@ import org.json4s.JsonAST.JValue
 import za.co.absa.spline.ol.aggregator.json.JsonSerDe
 import za.co.absa.spline.ol.aggregator.kafka.HeaderAppendingTransformerSupplier
 
-object AggregatorApp extends StrictLogging{
+object AggregatorApp extends StrictLogging {
 
   implicit def serde: Serde[JValue] = {
     val serializer = (a: JValue) => JsonSerDe.compact(JsonSerDe.render(a)).getBytes

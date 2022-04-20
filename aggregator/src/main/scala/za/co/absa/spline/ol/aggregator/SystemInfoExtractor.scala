@@ -24,7 +24,7 @@ import scala.util.{Failure, Success, Try}
 
 object SystemInfoExtractor {
 
-  val UnknownNameAndVersion = NameAndVersion("UNKNOWN", "0.0.0")
+  val UnknownNameAndVersion: NameAndVersion = NameAndVersion("UNKNOWN", "0.0.0")
 
   def extract(runEvent: RunEvent): NameAndVersion = {
     Try(URI.create(runEvent.producer)) match {
@@ -33,11 +33,12 @@ object SystemInfoExtractor {
     }
   }
 
-  private val openLineageREgex = "/tree/(\\d+.\\d+.\\d+)/integration/([^/]+)"r
+  private val openLineageREgex = "/tree/(\\d+.\\d+.\\d+)/integration/([^/]+)".r
 
   def extractFromProducerURI(producerUri: URI): NameAndVersion = {
     if (producerUri.getHost == "github.com" && producerUri.getPath.toLowerCase.startsWith("/openlineage")) {
-      openLineageREgex.findFirstMatchIn(producerUri.getPath)
+      openLineageREgex
+        .findFirstMatchIn(producerUri.getPath)
         .map(m => NameAndVersion(m.group(2), m.group(1)))
         .getOrElse(UnknownNameAndVersion)
     } else {

@@ -35,7 +35,7 @@ class RootServlet extends ScalatraServlet {
           <div class="row">
             <div class="span12">
               <h3>Open Lineage API Endpoint</h3>
-              <pre>{serverHost + ":" + serverPort + url("/lineage")}</pre>
+              <pre>{s"$serverHost:$serverPort${url("/lineage")}"}</pre>
 
               <h3>Configuration</h3>
               <pre>{RestConfig.toMap.map{ case (k, v) => s"$k = $v"}.mkString("\n")}</pre>

@@ -23,8 +23,13 @@ import java.time.{Instant, ZonedDateTime}
 /**
  * Converts java.time.Instant to and from ISO-8601 compliant String representation
  */
-object InstantSerializer extends CustomSerializer[Instant](format => ( {
-  case JString(s) => ZonedDateTime.parse(s).toInstant
-}, {
-  case i: Instant => JString(i.toString)
-}))
+object InstantSerializer extends CustomSerializer[Instant](
+  format => (
+    {
+      case JString(s) => ZonedDateTime.parse(s).toInstant
+    },
+    {
+      case i: Instant => JString(i.toString)
+    }
+  )
+)
