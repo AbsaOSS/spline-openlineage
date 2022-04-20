@@ -59,19 +59,17 @@ object AggregatorApp extends StrictLogging{
       .aggregate(JNothing: JValue)(
         (key, msg, aggMsg) => aggMsg.merge(msg),
         (key, msg, aggMsg) => aggMsg.merge(msg)
-      )(Materialized.as("spline-aggregator-store"))
+      )(Materialized.as("my-store"))
 
     //topic name: spline-open-lineage-aggregator-my-store-changelog
+    // spline.ol.streams.application.id + store name + changelog
 
     table.toStream
-      //.peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
+      .filter((k, v) => v != null)
       .filter((k, v) => extractEventType(v) == "COMPLETE")
       .map((windowedKey, value) => (windowedKey.key(), value))
-      //.peek((k,v) => println("\n" + k + " -> " + v + " : " + extractEventType(v)))
-      //.process(() => new SplineStreamProcessor)
       .flatMap(OpenLineageToSplineConverter.convert)
       .transformValues(new HeaderAppendingTransformerSupplier)
-      //.peek((k,v) => println("\n" + k + " -> " + v))
       .to(config.outputTopic)
 
     val topology = builder.build
@@ -83,7 +81,6 @@ object AggregatorApp extends StrictLogging{
   }
 
   private def extractEventType(json: JValue): String = {
-    //println(">>>" + json \ "eventType")
     JsonSerDe.fromJValue[String](json \ "eventType")
   }
 
