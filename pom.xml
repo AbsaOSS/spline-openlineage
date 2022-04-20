@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2022 ABSA Group Limited
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>za.co.absa.spline</groupId>
+    <artifactId>spline-open-lineage</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <scm>
+        <url>${scm.url}</url>
+        <connection>${scm.connection}</connection>
+        <developerConnection>${scm.developerConnection}</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <parent>
+        <groupId>za.co.absa</groupId>
+        <artifactId>root-pom</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <developers>
+        <developer>
+            <id>wajda</id>
+            <name>Oleksandr Vayda</name>
+            <roles>
+                <role>Tech Lead</role>
+                <role>Full-stack developer</role>
+            </roles>
+            <timezone>Europe/Prague</timezone>
+            <url>https://github.com/wajda</url>
+        </developer>
+        <developer>
+            <id>cerveada</id>
+            <name>Adam Červenka</name>
+            <roles>
+                <role>Back-end developer</role>
+            </roles>
+            <timezone>Europe/Prague</timezone>
+            <url>https://github.com/cerveada</url>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>rest-endpoint</module>
+        <module>aggregator</module>
+        <module>commons</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <scala.version>2.12.15</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+
+        <spline.server.version>1.0.0-SNAPSHOT</spline.server.version>
+
+        <json4s.version>4.0.5</json4s.version>
+
+        <logback.version>1.2.11</logback.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_${scala.binary.version}</artifactId>
+            <version>3.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Scala -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+
+            <!-- Kafka -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>2.7.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-streams-scala_${scala.binary.version}</artifactId>
+                <version>2.7.2</version>
+            </dependency>
+
+            <!-- Json -->
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-core_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-ext_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+
+            <!-- commons -->
+            <dependency>
+                <groupId>za.co.absa.commons</groupId>
+                <artifactId>commons_${scala.binary.version}</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>1.6</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4s</groupId>
+                <artifactId>slf4s-api_${scala.binary.version}</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.binary.version}</artifactId>
+                <version>3.1.0</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>scala-maven-plugin</artifactId>
+            <configuration>
+                <scalaVersion>${scala.version}</scalaVersion>
+                <args>
+                <arg>-target:jvm-${java.version}</arg>
+                <arg>-feature</arg>
+                <arg>-deprecation</arg>
+                <arg>-unchecked</arg>
+                <arg>-Ywarn-numeric-widen</arg>
+                <!--<arg>-Ywarn-dead-code</arg>-->
+                <!--<arg>-Ywarn-value-discard</arg>-->
+                </args>
+            </configuration>
+            <executions>
+                <execution>
+                <id>scala-compile</id>
+                <phase>process-resources</phase>
+                <goals>
+                    <goal>add-source</goal>
+                    <goal>compile</goal>
+                </goals>
+                </execution>
+                <execution>
+                <id>scala-test-compile</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                    <goal>testCompile</goal>
+                </goals>
+                </execution>
+                <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                    <goal>doc-jar</goal>
+                </goals>
+                </execution>
+            </executions>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>4.5.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
