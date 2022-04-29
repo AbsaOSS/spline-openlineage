@@ -27,6 +27,10 @@
 
     <artifactId>open-lineage-aggregator</artifactId>
 
+    <properties>
+        <dockerfile.imageName>spline-open-lineage-aggregator</dockerfile.imageName>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -47,7 +51,7 @@
         <dependency>
             <groupId>za.co.absa.spline</groupId>
             <artifactId>open-lineage-commons</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>za.co.absa.spline</groupId>
@@ -123,6 +127,16 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <buildArgs>
+                        <IMAGE_NAME>${dockerfile.imageName}</IMAGE_NAME>
+                    </buildArgs>
+                </configuration>
             </plugin>
         </plugins>
 

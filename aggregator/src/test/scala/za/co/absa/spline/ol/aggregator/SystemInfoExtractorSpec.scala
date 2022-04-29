@@ -22,7 +22,7 @@ import za.co.absa.spline.ol.model.openlineage.v0_3_1.RunEvent
 
 class SystemInfoExtractorSpec extends AnyFlatSpec with Matchers {
 
-  private val emptyRunEvent = RunEvent(None, null, null, null, None, None, "", "")
+  private val emptyRunEvent = RunEvent(None, null, null, null, None, None, "", Some(""))
 
   it should "recognize open lineage spark integrations" in {
     val event = emptyRunEvent.copy(producer = "https://github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/spark")

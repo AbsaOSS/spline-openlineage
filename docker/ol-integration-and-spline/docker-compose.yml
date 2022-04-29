@@ -1,0 +1,117 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: 'yes'
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_CFG_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - zookeeper
+  kafka-init:
+    image: 'bitnami/kafka:latest'
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --list
+      
+      echo -e 'Creating kafka topics'
+      /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic open-lineage-topic --bootstrap-server kafka:29092
+      /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic spline-lineage-topic --bootstrap-server kafka:29092
+      
+      echo -e 'Successfully created the following topics:'
+      /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --list
+      "
+  rest-proxy:
+    image: 'my/spline-open-lineage-rest-endpoint:latest'
+    environment:
+      CATALINA_OPTS: -Dspline.ol.producer.bootstrap.servers=kafka:29092
+    ports:
+      - '8092:8080'
+    depends_on:
+      - kafka-init
+  aggregator:
+    image: 'my/spline-open-lineage-aggregator:latest'
+    environment:
+      JAVA_OPTS: -Dspline.ol.streams.bootstrap.servers=kafka:29092
+    restart: always
+    depends_on:
+      - rest-proxy
+  arangodb:
+    image: arangodb:3.8.6
+    restart: always
+    ports:
+      - 8529:8529
+    environment:
+      ARANGO_NO_AUTH: 1
+  arangodb-init:
+    image: 'my/spline-admin:latest'
+    depends_on:
+      - arangodb
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until arangodb is reachable
+      until curl --output /dev/null --silent --get --fail http://arangodb:8529/_admin/server/availability
+      do
+        echo waiting for arango db
+        sleep 5
+      done
+      
+      echo creating spline database
+      java -jar ./admin.jar db-init arangodb://arangodb:8529/spline -s
+      status=$$?
+      
+      if [ $$status -eq 0 ]; then
+        echo 'database Created'
+      else
+        echo 'database creation failed'
+      fi
+      exit $$status
+      "
+  spline:
+    image: my/spline-rest-server:latest
+    restart: always
+    ports:
+      - '8090:8080'
+    environment:
+      SPLINE_DATABASE_CONNECTION_URL: 'arangodb://arangodb:8529/spline'
+    depends_on:
+      - arangodb-init
+  spline-kafka:
+    image: my/spline-kafka-server:latest
+    restart: always
+    environment:
+      CATALINA_OPTS: >-
+        -Dspline.kafka.consumer.bootstrap.servers=kafka:29092
+        -Dspline.kafka.consumer.group.id=spline-group
+        -Dspline.kafka.topic=spline-lineage-topic
+      SPLINE_DATABASE_CONNECTION_URL: 'arangodb://arangodb:8529/spline'
+    depends_on:
+      - arangodb-init
+      - kafka-init
+  ui:
+    image: my/spline-web-ui:latest
+    restart: always
+    environment:
+      # The consumer URL is used by the web browser
+      SPLINE_CONSUMER_URL: 'http://${DOCKER_HOST_EXTERNAL:-localhost}:8090/consumer'
+      # by default /dev/random is used which may block
+      CATALINA_OPTS: "-Dsecurerandom.source=file:/dev/./urandom -Djava.security.egd=file:/dev/./urandom"
+    ports:
+      - 8091:8080
+    depends_on:
+      - spline
