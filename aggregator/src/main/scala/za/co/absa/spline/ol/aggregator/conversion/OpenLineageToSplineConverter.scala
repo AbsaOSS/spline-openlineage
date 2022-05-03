@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package za.co.absa.spline.ol.aggregator
+package za.co.absa.spline.ol.aggregator.conversion
 
 import com.fasterxml.uuid.Generators
 import org.json4s.JsonAST.JValue
 import za.co.absa.spline.ol.aggregator.json.JsonSerDe
-import za.co.absa.spline.ol.aggregator.json.JsonSerDe._
+import za.co.absa.spline.ol.aggregator.json.JsonSerDe.fromJValue
+import za.co.absa.spline.ol.aggregator.{AggregatorBuildInfo, SystemInfoExtractor, ValueAndHeaders}
 import za.co.absa.spline.ol.model.openlineage.v0_3_1.{InputDataset, OutputDataset, RunEvent}
 import za.co.absa.spline.producer.model.v1_2._
 
@@ -42,7 +43,7 @@ object OpenLineageToSplineConverter {
       Seq.empty
     } else {
       val planEventSeq = convert(runEvent)
-      planEventSeq.flatMap{ case (p, e) =>
+      planEventSeq.flatMap { case (p, e) =>
         Seq(
           p.id.toString -> new ValueAndHeaders(JsonSerDe.toJson(p), planHeaders),
           e.planId.toString -> new ValueAndHeaders(JsonSerDe.toJson(e), eventHeaders)
@@ -97,7 +98,7 @@ object OpenLineageToSplineConverter {
 
   private def convertInputs(inputs: Seq[InputDataset]): Seq[ReadOperation] = {
     inputs.map(in => ReadOperation(
-      inputSources = Seq(toUri(in.name, in.namespace)),
+      inputSources = Seq(UriConverter.convert(in.namespace, in.name)),
       id = UUID.randomUUID().toString,
       name = None,
       output = None,
@@ -108,7 +109,7 @@ object OpenLineageToSplineConverter {
 
   private def convertOutput(output: OutputDataset, inputIds: Seq[String]): WriteOperation = {
     WriteOperation(
-      outputSource = toUri(output.name, output.namespace),
+      outputSource = UriConverter.convert(output.namespace, output.name),
       append = false,
       id = UUID.randomUUID().toString,
       name = None,
@@ -116,13 +117,6 @@ object OpenLineageToSplineConverter {
       params = Map.empty,
       extra = Map.empty
     )
-  }
-
-  private def toUri(name: String, namespace: String): String = {
-    if (name.startsWith("/"))
-      s"$namespace$name"
-    else
-      s"$namespace/$name"
   }
 
   private val ExecutionPlanUUIDNamespace: UUID = UUID.fromString("475196d0-16ca-4cba-aec7-c9f2ddd9326c")
