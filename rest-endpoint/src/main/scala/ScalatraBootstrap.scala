@@ -20,8 +20,8 @@ import za.co.absa.spline.ol.rest.{LineageServlet, RootServlet}
 import javax.servlet.ServletContext
 
 class ScalatraBootstrap extends LifeCycle {
-  override def init(context: ServletContext) = {
-    context.mount(new LineageServlet, "/lineage")
+  override def init(context: ServletContext): Unit = {
+    context.mount(new LineageServlet, "/api/v1/lineage")
     context.mount(new RootServlet, "/")
   }
 }

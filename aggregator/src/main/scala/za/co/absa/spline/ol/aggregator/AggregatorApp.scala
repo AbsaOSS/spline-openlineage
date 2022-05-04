@@ -27,6 +27,7 @@ import org.apache.kafka.streams.scala.serialization.Serdes
 import org.apache.kafka.streams.scala.serialization.Serdes._
 import org.json4s.JNothing
 import org.json4s.JsonAST.JValue
+import za.co.absa.spline.ol.aggregator.conversion.OpenLineageToSplineConverter
 import za.co.absa.spline.ol.aggregator.json.JsonSerDe
 import za.co.absa.spline.ol.aggregator.kafka.HeaderAppendingTransformerSupplier
 

@@ -47,5 +47,5 @@ case class RunEvent (
   inputs: Option[Seq[InputDataset]],
   outputs: Option[Seq[OutputDataset]],
   producer: String,
-  schemaURL: String
+  schemaURL: Option[String]
 )

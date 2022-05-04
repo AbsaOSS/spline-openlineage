@@ -43,6 +43,7 @@ class LineageServlet extends ScalatraServlet with JacksonJsonSupport with Strict
     Try(parsedBody.extract[RunEvent]) match {
       case Failure(e) =>
         logger.debug("Exception when parsing request body", e)
+        logger.debug(s"parsed body:$parsedBody")
         BadRequest()
       case Success(runEvent) =>
         val key = runEvent.run.runId.toString

@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package za.co.absa.spline.ol.aggregator
+package za.co.absa.spline.ol.aggregator.conversion
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import za.co.absa.spline.ol.aggregator.SystemInfoExtractor
 import za.co.absa.spline.ol.model.openlineage.v0_3_1.RunEvent
 
-class SystemInfoExtractorSpec extends AnyFlatSpec with Matchers {
+class UriConverterSpec extends AnyFlatSpec with Matchers {
 
-  private val emptyRunEvent = RunEvent(None, null, null, null, None, None, "", "")
-
-  it should "recognize open lineage spark integrations" in {
-    val event = emptyRunEvent.copy(producer = "https://github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/spark")
-    val result = SystemInfoExtractor.extract(event)
-    result.name shouldEqual "spark"
-    result.version shouldEqual "0.6.1"
+  it should "convert postgresql to spline format" in {
+    UriConverter.convert(
+      "postgres://host.docker.internal:5433",
+      "postgres.public.foo"
+    ) shouldEqual("jdbc:postgresql://localhost:5433/postgres:public.foo")
   }
 
-  it should "report unknown version" in {
-    val event = emptyRunEvent.copy(producer = "https://github.com/foo/bar/baz")
-    val result = SystemInfoExtractor.extract(event)
-    result.name shouldEqual "UNKNOWN"
-    result.version shouldEqual "0.0.0"
-  }
 }

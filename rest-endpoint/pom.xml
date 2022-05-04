@@ -32,8 +32,7 @@
         <swagger.docs.path>${project.build.directory}/api/docs</swagger.docs.path>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssX</maven.build.timestamp.format>
-        <dockerfile.imageName>spline-rest-server</dockerfile.imageName>
-
+        <dockerfile.imageName>spline-open-lineage-rest-endpoint</dockerfile.imageName>
         <scalatra.version>2.8.2</scalatra.version>
     </properties>
 
@@ -56,7 +55,7 @@
         <dependency>
             <groupId>za.co.absa.spline</groupId>
             <artifactId>open-lineage-commons</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scalatra</groupId>
@@ -114,5 +113,18 @@
         <finalName>spline-open-lineage-rest-${project.version}</finalName>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <buildArgs>
+                        <IMAGE_NAME>${dockerfile.imageName}</IMAGE_NAME>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
