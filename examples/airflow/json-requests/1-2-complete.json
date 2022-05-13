@@ -1,0 +1,45 @@
+{
+    "eventTime": "2022-04-25T13:26:35.501000Z",
+    "eventType": "COMPLETE",
+    "inputs": [],
+    "job": {
+        "facets": {
+            "sql": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SqlJobFacet",
+                "query": "INSERT INTO public.foo VALUES ('bar')"
+            }
+        },
+        "name": "InsertDataDag.new_room_booking",
+        "namespace": "default"
+    },
+    "outputs": [
+        {
+            "facets": {
+                "dataSource": {
+                    "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                    "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+                    "name": "postgres:/host.docker.internal:5433",
+                    "uri": "postgres:/host.docker.internal:5433"
+                },
+                "schema": {
+                    "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                    "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "type": "varchar"
+                        }
+                    ]
+                }
+            },
+            "name": ".public.foo",
+            "namespace": "postgres:/host.docker.internal:5433"
+        }
+    ],
+    "producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+    "run": {
+        "facets": {},
+        "runId": "902801e0-9f68-492c-8fab-eadd04559e59"
+    }
+}
