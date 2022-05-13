@@ -60,7 +60,7 @@
     </developers>
 
     <modules>
-        <module>rest-endpoint</module>
+        <module>rest-proxy</module>
         <module>aggregator</module>
         <module>commons</module>
     </modules>
