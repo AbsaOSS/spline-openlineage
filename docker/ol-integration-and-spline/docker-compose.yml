@@ -36,7 +36,7 @@ services:
       /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --list
       "
   rest-proxy:
-    image: my/spline-open-lineage-rest-endpoint:${SPLINE_OPEN_LINEAGE_VERSION}
+    image: my/spline-open-lineage-rest-proxy:${SPLINE_OPEN_LINEAGE_VERSION}
     environment:
       CATALINA_OPTS: -Dspline.ol.producer.bootstrap.servers=kafka:29092
     ports:
