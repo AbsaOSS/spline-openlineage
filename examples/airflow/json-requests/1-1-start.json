@@ -1,0 +1,75 @@
+{
+    "eventTime": "2022-04-25T13:26:34.468481Z",
+    "eventType": "START",
+    "inputs": [],
+    "job": {
+        "facets": {
+            "sql": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SqlJobFacet",
+                "query": "INSERT INTO public.foo VALUES ('bar')"
+            }
+        },
+        "name": "InsertDataDag.new_room_booking",
+        "namespace": "default"
+    },
+    "outputs": [
+        {
+            "facets": {
+                "dataSource": {
+                    "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                    "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+                    "name": "postgres:/host.docker.internal:5433",
+                    "uri": "postgres:/host.docker.internal:5433"
+                },
+                "schema": {
+                    "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                    "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "type": "varchar"
+                        }
+                    ]
+                }
+            },
+            "name": ".public.foo",
+            "namespace": "postgres:/host.docker.internal:5433"
+        }
+    ],
+    "producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+    "run": {
+        "facets": {
+            "airflow_runArgs": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet",
+                "externalTrigger": true
+            },
+            "airflow_version": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/BaseFacet",
+                "airflowVersion": "2.2.4",
+                "openlineageAirflowVersion": "0.6.1",
+                "operator": "airflow.providers.postgres.operators.postgres.PostgresOperator",
+                "taskInfo": "{'task_id': 'new_room_booking', 'label': 'new_room_booking', 'owner': 'airflow', 'email': None, 'email_on_retry': True, 'email_on_failure': True, 'start_date': DateTime(2021, 1, 1, 0, 0, 0, tzinfo=Timezone('UTC')), 'end_date': None, 'trigger_rule': 'all_success', 'depends_on_past': False, 'wait_for_downstream': False, 'retries': 0, 'queue': 'default', 'pool': 'default_pool', 'pool_slots': 1, 'sla': None, 'execution_timeout': None, 'on_execute_callback': None, 'on_failure_callback': None, 'on_success_callback': None, 'on_retry_callback': None, '_pre_execute_hook': None, '_post_execute_hook': None, 'retry_delay': datetime.timedelta(seconds=300), 'retry_exponential_backoff': False, 'max_retry_delay': None, 'params': {}, 'priority_weight': 1, 'weight_rule': 'downstream', 'resources': None, 'run_as_user': None, 'max_active_tis_per_dag': None, 'executor_config': {}, 'do_xcom_push': True, 'doc_md': None, 'doc_json': None, 'doc_yaml': None, 'doc_rst': None, 'doc': None, '_upstream_task_ids': set(), '_downstream_task_ids': set(), '_dag': <DAG: InsertDataDag>, 'subdag': None, 'inlets': [], 'outlets': [], '_inlets': [], '_outlets': [], '_BaseOperator__instantiated': True, 'sql': \"INSERT INTO public.foo VALUES ('bar')\", 'postgres_conn_id': 'local-postgre', 'autocommit': False, 'parameters': None, 'database': None, 'hook': <airflow.providers.postgres.hooks.postgres.PostgresHook object at 0x7f90a9b6acd0>, '_log': <Logger airflow.task.operators (INFO)>, '_lock_for_execution': True}"
+            },
+            "nominalTime": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/NominalTimeRunFacet",
+                "nominalStartTime": "2022-04-25T13:26:32.731477Z"
+            },
+            "parentRun": {
+                "_producer": "https:/github.com/OpenLineage/OpenLineage/tree/0.6.1/integration/airflow",
+                "_schemaURL": "https:/raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/ParentRunFacet",
+                "job": {
+                    "name": "InsertDataDag.new_room_booking",
+                    "namespace": "default"
+                },
+                "run": {
+                    "runId": "manual__2022-04-25T13:26:32.731477+00:00"
+                }
+            }
+        },
+        "runId": "902801e0-9f68-492c-8fab-eadd04559e59"
+    }
+}
