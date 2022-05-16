@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   zookeeper:
     image: bitnami/zookeeper:${BITNAMI_ZOOKEEPER_VERSION}
@@ -20,8 +18,6 @@ services:
       - zookeeper
   kafka-init:
     image: bitnami/kafka:${BITNAMI_KAFKA_VERSION}
-    depends_on:
-      - kafka
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
@@ -35,6 +31,8 @@ services:
       echo -e 'Successfully created the following topics:'
       /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --list
       "
+    depends_on:
+      - kafka
   rest-proxy:
     image: my/spline-open-lineage-rest-proxy:${SPLINE_OPEN_LINEAGE_VERSION}
     environment:
@@ -42,11 +40,12 @@ services:
     ports:
       - ${SPLINE_REST_PROXY_PORT}:8080
     depends_on:
-      - kafka-init
+      kafka-init:
+        condition: service_completed_successfully
   aggregator:
     image: my/spline-open-lineage-aggregator:${SPLINE_OPEN_LINEAGE_VERSION}
     environment:
       JAVA_OPTS: -Dspline.ol.streams.bootstrap.servers=kafka:29092
-    restart: always
     depends_on:
-      - rest-proxy
+      kafka-init:
+        condition: service_completed_successfully

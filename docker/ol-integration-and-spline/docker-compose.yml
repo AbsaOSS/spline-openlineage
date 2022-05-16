@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   zookeeper:
     image: bitnami/zookeeper:${BITNAMI_ZOOKEEPER_VERSION}
@@ -20,8 +18,6 @@ services:
       - zookeeper
   kafka-init:
     image: bitnami/kafka:${BITNAMI_KAFKA_VERSION}
-    depends_on:
-      - kafka
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
@@ -35,6 +31,8 @@ services:
       echo -e 'Successfully created the following topics:'
       /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --list
       "
+    depends_on:
+      - kafka
   rest-proxy:
     image: my/spline-open-lineage-rest-proxy:${SPLINE_OPEN_LINEAGE_VERSION}
     environment:
@@ -42,17 +40,17 @@ services:
     ports:
       - ${SPLINE_REST_PROXY_PORT}:8080
     depends_on:
-      - kafka-init
+      kafka-init:
+        condition: service_completed_successfully
   aggregator:
     image: my/spline-open-lineage-aggregator:${SPLINE_OPEN_LINEAGE_VERSION}
     environment:
       JAVA_OPTS: -Dspline.ol.streams.bootstrap.servers=kafka:29092
-    restart: always
     depends_on:
-      - rest-proxy
+      kafka-init:
+        condition: service_completed_successfully
   arangodb:
     image: arangodb:${ARANGO_DB_VERSION}
-    restart: always
     ports:
       - ${ARANGO_DB_PORT}:8529
     environment:
@@ -84,16 +82,15 @@ services:
       "
   spline:
     image: my/spline-rest-server:${SPLINE_CORE_VERSION}
-    restart: always
     ports:
       - ${SPLINE_REST_PORT}:8080
     environment:
       SPLINE_DATABASE_CONNECTION_URL: 'arangodb://arangodb:8529/spline'
     depends_on:
-      - arangodb-init
+      arangodb-init:
+        condition: service_completed_successfully
   spline-kafka:
     image: my/spline-kafka-server:${SPLINE_CORE_VERSION}
-    restart: always
     environment:
       CATALINA_OPTS: >-
         -Dspline.kafka.consumer.bootstrap.servers=kafka:29092
@@ -101,11 +98,12 @@ services:
         -Dspline.kafka.topic=spline-lineage-topic
       SPLINE_DATABASE_CONNECTION_URL: 'arangodb://arangodb:8529/spline'
     depends_on:
-      - arangodb-init
-      - kafka-init
+      arangodb-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
   ui:
     image: my/spline-web-ui:${SPLINE_UI_VERSION}
-    restart: always
     environment:
       # The consumer URL is used by the web browser
       SPLINE_CONSUMER_URL: 'http://${DOCKER_HOST_EXTERNAL:-localhost}:${SPLINE_REST_PORT}/consumer'
