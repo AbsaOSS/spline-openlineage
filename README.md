@@ -1,4 +1,4 @@
-# Spline Server Open lineage Integration
+# Spline OpenLineage Integration
 Applications in this repo provide a way to send an **open lineage** messages into **spline server**.
 
 
