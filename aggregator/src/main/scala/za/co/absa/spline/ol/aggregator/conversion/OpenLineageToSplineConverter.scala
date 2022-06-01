@@ -76,7 +76,7 @@ object OpenLineageToSplineConverter {
         expressions = None,
         systemInfo = SystemInfoExtractor.extract(runEvent),
         agentInfo = Some(NameAndVersion(s"spline-open-lineage-aggregator", AggregatorBuildInfo.Version)),
-        extraInfo = Map.empty
+        extraInfo = createExtra(runEvent.job.facets)
       )
 
       val planId = generateId(planWithoutId)
@@ -89,7 +89,7 @@ object OpenLineageToSplineConverter {
         durationNs = None,
         discriminator = None,
         error = None,
-        extra = Map.empty
+        extra = createExtra(runEvent.run.facets)
       )
 
       (plan, event)
@@ -103,7 +103,8 @@ object OpenLineageToSplineConverter {
       name = None,
       output = None,
       params = Map.empty,
-      extra = Map.empty
+      extra = createExtra(in.facets) ++
+        in.inputFacets.map(fs => Map("inputFacets" -> fs)).getOrElse(Map.empty)
     ))
   }
 
@@ -115,9 +116,15 @@ object OpenLineageToSplineConverter {
       name = None,
       childIds = inputIds,
       params = Map.empty,
-      extra = Map.empty
+      extra = createExtra(output.facets) ++
+        output.outputFacets.map(fs => Map("outputFacets" -> fs)).getOrElse(Map.empty)
     )
   }
+
+  private def createExtra(facets: Option[Map[String, Any]]): Map[String, Any] =
+    facets
+      .map(facetMap => Map("facets" -> facetMap))
+      .getOrElse(Map.empty)
 
   private val ExecutionPlanUUIDNamespace: UUID = UUID.fromString("475196d0-16ca-4cba-aec7-c9f2ddd9326c")
 

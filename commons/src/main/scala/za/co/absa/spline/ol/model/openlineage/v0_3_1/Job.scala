@@ -35,5 +35,5 @@ package za.co.absa.spline.ol.model.openlineage.v0_3_1
 case class Job (
   namespace: String,
   name: String,
-  facets: Option[Map[String, JobFacet]]
+  facets: Option[Map[String, Any]]
 )

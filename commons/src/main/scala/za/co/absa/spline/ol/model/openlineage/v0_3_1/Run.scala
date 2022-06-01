@@ -35,5 +35,5 @@ import java.util.UUID
  */
 case class Run (
   runId: UUID,
-  facets: Option[Map[String, RunFacet]]
+  facets: Option[Map[String, Any]]
 )

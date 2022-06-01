@@ -38,6 +38,6 @@ package za.co.absa.spline.ol.model.openlineage.v0_3_1
 case class OutputDataset (
   namespace: String,
   name: String,
-  facets: Option[Map[String, DatasetFacet]],
-  outputFacets: Option[Map[String, OutputDatasetFacet]]
+  facets: Option[Map[String, Any]],
+  outputFacets: Option[Map[String, Any]]
 )
